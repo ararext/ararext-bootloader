@@ -1,0 +1,12 @@
+[build]
+target = "thumbv7em-none-eabihf"
+
+[target.thumbv7em-none-eabihf]
+runner = "arm-none-eabi-gdb -q -x openocd.gdb"
+rustflags = [
+    "-C", "link-arg=-Tlink.x",
+]
+
+[unstable]
+build-std = ["core", "compiler_builtins"]
+build-std-features = ["compiler_builtins-mem"]

@@ -1,0 +1,11 @@
+/home/ararext/Documents/Kernel/ararext-bootloader/target/debug/deps/semver_parser-5bededfb5cbc7bf5.d: /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/lib.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/version.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/range.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/common.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/recognize.rs
+
+/home/ararext/Documents/Kernel/ararext-bootloader/target/debug/deps/libsemver_parser-5bededfb5cbc7bf5.rlib: /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/lib.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/version.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/range.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/common.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/recognize.rs
+
+/home/ararext/Documents/Kernel/ararext-bootloader/target/debug/deps/libsemver_parser-5bededfb5cbc7bf5.rmeta: /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/lib.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/version.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/range.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/common.rs /home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/recognize.rs
+
+/home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/lib.rs:
+/home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/version.rs:
+/home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/range.rs:
+/home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/common.rs:
+/home/ararext/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/semver-parser-0.7.0/src/recognize.rs:
