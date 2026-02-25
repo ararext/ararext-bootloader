@@ -94,40 +94,46 @@ pub struct CommandPacket {
 }
 
 impl CommandPacket {
-    pub fn parse(buffer: &[u8]) -> Option<Self> {
-        if buffer.len() < 4 {
+    pub fn parse(frame: &[u8]) -> Option<Self> {
+        if frame.len() < 6 {
             return None;
         }
-        
-        let length = buffer[0];
-        let command = buffer[1];
-        
-        if buffer.len() < (2 + length as usize) {
+
+        let length = frame[0] as usize;
+        if (length + 1) != frame.len() {
             return None;
         }
-        
-        // Extract CRC (last 4 bytes)
-        let crc_offset = 2 + (length as usize) - 4;
+
+        // Length includes [Command][Payload][CRC32]
+        // Minimum legal value is 5 => 1 command + 4 CRC bytes.
+        if length < 5 {
+            return None;
+        }
+
+        let command = frame[1];
+        let crc_offset = frame.len() - 4;
         let crc = u32::from_le_bytes([
-            buffer[crc_offset],
-            buffer[crc_offset + 1],
-            buffer[crc_offset + 2],
-            buffer[crc_offset + 3],
+            frame[crc_offset],
+            frame[crc_offset + 1],
+            frame[crc_offset + 2],
+            frame[crc_offset + 3],
         ]);
-        
-        // Extract payload (excluding CRC)
-        let payload_len = (length as usize).saturating_sub(1); // -1 for command byte
-        let mut payload = [0u8; BL_RX_LEN - 3];
-        
-        if payload_len > 0 {
-            payload[..payload_len - 4].copy_from_slice(&buffer[2..2 + payload_len - 4]);
+
+        let payload_len = length - 1 - 4; // - command and CRC
+        if payload_len > (BL_RX_LEN - 3) {
+            return None;
         }
-        
+
+        let mut payload = [0u8; BL_RX_LEN - 3];
+        if payload_len > 0 {
+            payload[..payload_len].copy_from_slice(&frame[2..2 + payload_len]);
+        }
+
         Some(CommandPacket {
-            length,
+            length: length as u8,
             command,
             payload,
-            payload_len: payload_len.saturating_sub(4),
+            payload_len,
             crc,
         })
     }

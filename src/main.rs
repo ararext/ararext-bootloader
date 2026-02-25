@@ -99,32 +99,49 @@ fn bootloader_loop(
     tx: &mut stm32f4xx_hal::serial::Tx<stm32::USART2>,
 ) -> ! {
     use embedded_hal::serial::Read;
-    use embedded_hal::serial::Write;
     
     let mut uart = UartComm::new();
     
-    loop {
+    'boot: loop {
         // Read command length (first byte)
-        let mut length = 0u8;
-        loop {
-            if let Ok(byte) = nb::block!(rx.read()) {
-                length = byte;
-                break;
+        let length = match nb::block!(rx.read()) {
+            Ok(byte) => byte,
+            Err(_) => {
+                UartComm::send_nack(tx);
+                continue;
             }
+        };
+
+        // Frame length includes the first length byte.
+        let frame_len = (length as usize) + 1;
+        if frame_len > BL_RX_LEN || length < 5 {
+            UartComm::send_nack(tx);
+            continue;
         }
         
         // Read command packet
         let mut buffer = [0u8; BL_RX_LEN];
         buffer[0] = length;
         
-        for i in 1..=(length as usize) {
-            if let Ok(byte) = nb::block!(rx.read()) {
-                buffer[i] = byte;
+        for i in 1..frame_len {
+            match nb::block!(rx.read()) {
+                Ok(byte) => buffer[i] = byte,
+                Err(_) => {
+                    UartComm::send_nack(tx);
+                    continue 'boot;
+                }
             }
+        }
+
+        let frame = &buffer[..frame_len];
+
+        if !crc::verify_frame_crc(frame) {
+            UartComm::send_nack(tx);
+            continue;
         }
         
         // Parse command packet
-        if let Some(packet) = CommandPacket::parse(&buffer) {
+        if let Some(packet) = CommandPacket::parse(frame) {
             match packet.command {
                 BL_GET_VER => {
                     handle_getver_cmd(&packet.payload[..packet.payload_len], &mut uart, tx);
