@@ -1,9 +1,5 @@
 // UART communication module
-use embedded_hal::serial::Read;
-use stm32f4xx_hal::serial::Serial;
-use stm32f4xx_hal::gpio::{Input, Floating, PA, PB};
-use stm32f4xx_hal::prelude::*;
-use stm32f4xx_hal::stm32::USART2;
+use embedded_hal::serial::{Read, Write};
 use crate::constants::*;
 
 /// UART communication wrapper
@@ -21,9 +17,9 @@ impl UartComm {
     }
     
     /// Read a single byte from UART
-    pub fn read_byte<RX>(serial: &mut Serial<USART2, RX>) -> Option<u8>
+    pub fn read_byte<R>(serial: &mut R) -> Option<u8>
     where
-        RX: Read<u8>,
+        R: Read<u8>,
     {
         match nb::block!(serial.read()) {
             Ok(byte) => Some(byte),
@@ -32,26 +28,38 @@ impl UartComm {
     }
     
     /// Write a single byte to UART
-    pub fn write_byte(byte: u8, serial: &mut Serial<USART2, _, _>) {
+    pub fn write_byte<W>(byte: u8, serial: &mut W)
+    where
+        W: Write<u8>,
+    {
         nb::block!(serial.write(byte)).ok();
     }
     
     /// Write a buffer to UART
-    pub fn write_buffer(buffer: &[u8], serial: &mut Serial<USART2, _, _>) {
+    pub fn write_buffer<W>(buffer: &[u8], serial: &mut W)
+    where
+        W: Write<u8>,
+    {
         for &byte in buffer {
             nb::block!(serial.write(byte)).ok();
         }
     }
     
     /// Send ACK response
-    pub fn send_ack(command_code: u8, follow_len: u8, serial: &mut Serial<USART2, _, _>) {
+    pub fn send_ack<W>(command_code: u8, follow_len: u8, serial: &mut W)
+    where
+        W: Write<u8>,
+    {
         Self::write_byte(BL_ACK, serial);
         Self::write_byte(command_code, serial);
         Self::write_byte(follow_len, serial);
     }
     
     /// Send NACK response
-    pub fn send_nack(serial: &mut Serial<USART2, _, _>) {
+    pub fn send_nack<W>(serial: &mut W)
+    where
+        W: Write<u8>,
+    {
         Self::write_byte(BL_NACK, serial);
     }
     

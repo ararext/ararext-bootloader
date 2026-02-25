@@ -1,10 +1,8 @@
 // Bootloader command handlers
 use crate::constants::*;
 use crate::uart::UartComm;
-use crate::memory::{self, MemoryRegion};
-use crate::crc;
-use stm32f4xx_hal::serial::Serial;
-use stm32f4xx_hal::stm32::USART2;
+use crate::memory;
+use embedded_hal::serial::Write;
 
 pub trait CommandHandler {
     fn handle_get_version(&self);
@@ -27,7 +25,7 @@ pub fn get_bootloader_version() -> u8 {
 }
 
 /// Handle BL_GET_VER command
-pub fn handle_getver_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_getver_cmd<W: Write<u8>>(packet: &[u8], uart: &mut UartComm, serial: &mut W) {
     let version = get_bootloader_version();
     
     UartComm::send_ack(BL_GET_VER, 1, serial);
@@ -35,7 +33,7 @@ pub fn handle_getver_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial
 }
 
 /// Handle BL_GET_HELP command
-pub fn handle_gethelp_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_gethelp_cmd<W: Write<u8>>(uart: &mut UartComm, serial: &mut W) {
     let num_commands = SUPPORTED_COMMANDS.len() as u8;
     
     UartComm::send_ack(BL_GET_HELP, num_commands, serial);
@@ -43,7 +41,7 @@ pub fn handle_gethelp_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>
 }
 
 /// Handle BL_GET_CID command
-pub fn handle_getcid_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_getcid_cmd<W: Write<u8>>(uart: &mut UartComm, serial: &mut W) {
     let chip_id = memory::get_mcu_chip_id();
     let cid_bytes = chip_id.to_le_bytes();
     
@@ -52,7 +50,7 @@ pub fn handle_getcid_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>)
 }
 
 /// Handle BL_GET_RDP_STATUS command
-pub fn handle_getrdp_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_getrdp_cmd<W: Write<u8>>(uart: &mut UartComm, serial: &mut W) {
     let rdp_level = memory::get_flash_rdp_level();
     
     UartComm::send_ack(BL_GET_RDP_STATUS, 1, serial);
@@ -60,7 +58,7 @@ pub fn handle_getrdp_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>)
 }
 
 /// Handle BL_GO_TO_ADDR command
-pub fn handle_go_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_go_cmd<W: Write<u8>>(packet: &[u8], uart: &mut UartComm, serial: &mut W) {
     if packet.len() < 4 {
         UartComm::send_nack(serial);
         return;
@@ -82,7 +80,7 @@ pub fn handle_go_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USA
 }
 
 /// Handle BL_FLASH_ERASE command
-pub fn handle_flash_erase_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_flash_erase_cmd<W: Write<u8>>(packet: &[u8], uart: &mut UartComm, serial: &mut W) {
     if packet.len() < 2 {
         UartComm::send_nack(serial);
         return;
@@ -98,7 +96,7 @@ pub fn handle_flash_erase_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut S
 }
 
 /// Handle BL_MEM_WRITE command
-pub fn handle_mem_write_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_mem_write_cmd<W: Write<u8>>(packet: &[u8], uart: &mut UartComm, serial: &mut W) {
     if packet.len() < 6 {
         UartComm::send_nack(serial);
         return;
@@ -123,7 +121,7 @@ pub fn handle_mem_write_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Ser
 }
 
 /// Handle BL_MEM_READ command
-pub fn handle_mem_read_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_mem_read_cmd<W: Write<u8>>(packet: &[u8], uart: &mut UartComm, serial: &mut W) {
     if packet.len() < 6 {
         UartComm::send_nack(serial);
         return;
@@ -147,7 +145,7 @@ pub fn handle_mem_read_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Seri
 }
 
 /// Handle BL_EN_RW_PROTECT command
-pub fn handle_en_rw_protect_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_en_rw_protect_cmd<W: Write<u8>>(packet: &[u8], uart: &mut UartComm, serial: &mut W) {
     if packet.len() < 2 {
         UartComm::send_nack(serial);
         return;
@@ -157,12 +155,12 @@ pub fn handle_en_rw_protect_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut
 }
 
 /// Handle BL_DIS_R_W_PROTECT command
-pub fn handle_dis_rw_protect_cmd(packet: &[u8], uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_dis_rw_protect_cmd<W: Write<u8>>(packet: &[u8], uart: &mut UartComm, serial: &mut W) {
     UartComm::send_ack(BL_DIS_R_W_PROTECT, 0, serial);
 }
 
 /// Handle BL_READ_SECTOR_P_STATUS command
-pub fn handle_read_sector_protection_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_read_sector_protection_cmd<W: Write<u8>>(uart: &mut UartComm, serial: &mut W) {
     let protection_status = crate::flash::read_ob_rw_protection_status();
     let status_bytes = protection_status.to_le_bytes();
     
@@ -171,7 +169,7 @@ pub fn handle_read_sector_protection_cmd(uart: &mut UartComm, serial: &mut Seria
 }
 
 /// Handle BL_OTP_READ command
-pub fn handle_read_otp_cmd(uart: &mut UartComm, serial: &mut Serial<USART2, _, _>) {
+pub fn handle_read_otp_cmd<W: Write<u8>>(uart: &mut UartComm, serial: &mut W) {
     // OTP read - stub for now
     UartComm::send_nack(serial);
 }

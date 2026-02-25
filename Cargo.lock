@@ -20,7 +20,6 @@ dependencies = [
  "embedded-hal",
  "nb 0.1.3",
  "panic-halt",
- "stm32f4 0.10.0",
  "stm32f4xx-hal",
 ]
 
@@ -242,23 +241,13 @@ checksum = "6ce2be8dc25455e1f91df71bfa12ad37d7af1092ae736f3a6cd0e37bc7810596"
 
 [[package]]
 name = "stm32f4"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44a3d6c58b14e63926273694e7dd644894513c5e35ce6928c4657ddb62cae976"
-dependencies = [
- "bare-metal",
- "cortex-m 0.6.7",
- "vcell",
-]
-
-[[package]]
-name = "stm32f4"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "11460b4de3a84f072e2cf6e76306c64d27f405a0e83bace0a726f555ddf4bf33"
 dependencies = [
  "bare-metal",
  "cortex-m 0.6.7",
+ "cortex-m-rt",
  "vcell",
 ]
 
@@ -275,7 +264,7 @@ dependencies = [
  "embedded-hal",
  "nb 0.1.3",
  "rand_core",
- "stm32f4 0.11.0",
+ "stm32f4",
  "void",
 ]
 

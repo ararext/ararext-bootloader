@@ -193,11 +193,3 @@ fn jump_to_user_app() -> ! {
         jump()
     }
 }
-
-// Needed for providing default panic handler in no_std environments
-use core::panic::PanicInfo;
-
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
