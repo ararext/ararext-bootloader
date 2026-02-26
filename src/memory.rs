@@ -15,10 +15,10 @@ use crate::constants::*;
 /// # Returns
 /// ADDR_VALID if address is in a valid region, ADDR_INVALID otherwise
 pub fn verify_address(address: u32) -> u8 {
-    if (address >= SRAM1_BASE && address <= SRAM1_END) ||
-       (address >= SRAM2_BASE && address <= SRAM2_END) ||
-       (address >= FLASH_BASE && address <= FLASH_END) ||
-       (address >= BKPSRAM_BASE && address <= BKPSRAM_END) {
+    if (address >= SRAM1_BASE && address < SRAM1_END) ||
+       (address >= SRAM2_BASE && address < SRAM2_END) ||
+       (address >= FLASH_BASE && address < FLASH_END) ||
+       (address >= BKPSRAM_BASE && address < BKPSRAM_END) {
         ADDR_VALID
     } else {
         ADDR_INVALID
@@ -64,10 +64,10 @@ pub enum MemoryRegion {
 /// Identify which memory region an address belongs to
 pub fn identify_memory_region(address: u32) -> MemoryRegion {
     match address {
-        addr if addr >= SRAM1_BASE && addr <= SRAM1_END => MemoryRegion::SRAM1,
-        addr if addr >= SRAM2_BASE && addr <= SRAM2_END => MemoryRegion::SRAM2,
-        addr if addr >= FLASH_BASE && addr <= FLASH_END => MemoryRegion::Flash,
-        addr if addr >= BKPSRAM_BASE && addr <= BKPSRAM_END => MemoryRegion::BackupSram,
+        addr if addr >= SRAM1_BASE && addr < SRAM1_END => MemoryRegion::SRAM1,
+        addr if addr >= SRAM2_BASE && addr < SRAM2_END => MemoryRegion::SRAM2,
+        addr if addr >= FLASH_BASE && addr < FLASH_END => MemoryRegion::Flash,
+        addr if addr >= BKPSRAM_BASE && addr < BKPSRAM_END => MemoryRegion::BackupSram,
         _ => MemoryRegion::Unknown,
     }
 }

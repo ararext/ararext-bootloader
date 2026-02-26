@@ -10,7 +10,7 @@ sudo apt-get install arm-none-eabi-binutils
 
 ### 2. Build
 ```bash
-cd /home/ararext/Documents/Kernel/ararext-bootloader
+cd /home/ararext/update_projects/ararext-bootloader
 cargo build --release
 ```
 
@@ -29,7 +29,7 @@ openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \
 ## 📁 Project Structure
 
 ```
-aarext-bootloader/
+ararext-bootloader/
 ├── src/
 │   ├── main.rs           # Entry point and bootloader loop
 │   ├── constants.rs      # Definitions and constants
@@ -147,11 +147,11 @@ arm-none-eabi-gdb target/thumbv7em-none-eabihf/release/ararext-bootloader
 
 ## 🔐 Key Safety Features
 
-✅ CRC-32 verification on all commands
+✅ CRC-32 verification on incoming protocol frames
 ✅ Address validation before jumping
 ✅ Compile-time buffer overflow prevention
 ✅ Type-safe command parsing
-✅ No undefined behavior (Rust guarantees)
+✅ Unsupported operations fail closed with NACK
 
 ## 📚 Documentation Map
 
@@ -175,8 +175,8 @@ target = "thumbv7em-none-eabihf"  # Keep for F407
 In `main.rs`:
 ```rust
 let clocks = rcc.cfgr
-    .use_hse(8.MHz())
-    .sysclk(84.MHz())  // Change here
+    .use_hse(8.mhz())
+    .sysclk(84.mhz())  // Change here
     .freeze();
 ```
 
@@ -250,7 +250,7 @@ done
 
 | Version | Status | Notes |
 |---------|--------|-------|
-| 0.1.0 | ✅ Released | Complete bootloader with 12 commands |
+| 0.1.0 | ⚠️ In progress | Core command protocol active; some command handlers still return NACK |
 
 ## 📋 Checklist for Deployment
 
@@ -258,7 +258,7 @@ done
 - [ ] Binary size < 32 KB: ~25 KB
 - [ ] Device flashed successfully
 - [ ] Button boot into bootloader works
-- [ ] All 12 commands tested
+- [ ] Required command subset tested end-to-end (`GET_VER`, `GET_HELP`, `GET_CID`, `GET_RDP_STATUS`, `GO_TO_ADDR`, `MEM_READ`)
 - [ ] CRC validation verified
 - [ ] User app jumps successfully
 - [ ] Serial communication verified at 115200 bps
@@ -278,7 +278,7 @@ done
 ✅ **Type Safe**: Commands and regions are typed, not raw bytes
 ✅ **Better Errors**: Compiler catches bugs before runtime
 ✅ **Documented**: Comprehensive guides and inline documentation
-✅ **Production Ready**: No undefined behavior, fully tested
+✅ **Honest Status**: Unimplemented features explicitly return NACK
 
 ## 🎯 Next Steps
 
@@ -293,4 +293,4 @@ done
 **For detailed information, see the full documentation in README.md, BUILD.md, and ARCHITECTURE.md**
 
 Last Updated: 2026  
-Status: ✅ Production Ready
+Status: ⚠️ Active Development

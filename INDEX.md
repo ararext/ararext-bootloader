@@ -370,16 +370,16 @@ ararext-bootloader/
 ## 🏆 Project Status
 
 - **Version**: 0.1.0
-- **Status**: ✅ Production Ready
+- **Status**: ⚠️ Active Development
 - **Language**: Rust (Edition 2021)
 - **Target**: STM32F407xx (Cortex-M4F)
 - **Build System**: Cargo
 - **Documentation**: Comprehensive
-- **Safety Level**: Maximum
+- **Safety Level**: High (frame checks, CRC validation, address validation)
 
 ---
 
 **Start with [QUICKSTART.md](QUICKSTART.md) for immediate access!**
 
 **Last Updated**: 2026  
-**Location**: /home/ararext/Documents/Kernel/ararext-bootloader/
+**Location**: /home/ararext/update_projects/ararext-bootloader/

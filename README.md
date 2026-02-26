@@ -4,12 +4,12 @@ A high-performance, type-safe bootloader for STM32F407xx microcontrollers writte
 
 ## Overview
 
-This is a complete rewrite of the STM32F407xx bootloader in Rust, providing:
+This is a Rust implementation of an STM32F407xx bootloader, providing:
 
 - **Memory Safety**: Leverages Rust's type system and ownership model for bug-free bootloader code
 - **Performance**: Comparable to C implementation with better optimization potential
 - **Maintainability**: Clear separation of concerns with module-based architecture
-- **Reliability**: No undefined behavior, no buffer overflows, comprehensive type checking
+- **Reliability**: Strict frame validation, CRC checks, and explicit NACK handling for unsupported operations
 
 ## Features
 
@@ -40,7 +40,7 @@ This is a complete rewrite of the STM32F407xx bootloader in Rust, providing:
 
 ### Security Features
 
-- CRC-32 verification on all commands
+- CRC-32 verification on incoming protocol frames
 - Address validation before jumping
 - Sector-based flash protection
 - Hardware-enforced memory isolation
@@ -79,7 +79,7 @@ ararext-bootloader/
 - **USART3** (PB10/PB11): Debug output
 
 ### GPIO
-- **PA0 (B1)**: Mode selection button (high = bootloader, low = run app)
+- **PA0 (B1)**: Mode selection button (low = bootloader, high = run app)
 - **PA5 (LD2)**: Status LED
 
 ### Memory Map
@@ -179,7 +179,7 @@ lto = true          # Link-time optimization
 codegen-units = 1   # Better optimization
 ```
 
-Result: Typically 15-20% smaller binary than C version
+Result: Binary-size claims should be validated per build/profile before publication.
 
 ## Usage Examples
 
@@ -222,9 +222,9 @@ Recv: [0xA5][0x55][0x00]
 ## Known Limitations & Future Work
 
 ### Current Limitations
+- ⚠️ Several command IDs are defined but currently return `NACK` until flash/protection wiring is completed
 - ⚠️ OTP read command is a stub
-- ⚠️ Flash write uses byte-by-byte approach (can be optimized to word-level)
-- ⚠️ CRC calculation could use hardware acceleration
+- ⚠️ Hardware CRC peripheral is not currently used
 
 ### Planned Improvements
 - [ ] Implement hardware CRC acceleration
@@ -241,7 +241,6 @@ The project uses these key Rust crates:
 
 - **cortex-m**: ARM Cortex-M utilities
 - **cortex-m-rt**: Runtime and startup code
-- **stm32f4**: STM32F4 peripheral definitions
 - **stm32f4xx-hal**: Hardware abstraction layer
 - **embedded-hal**: Trait definitions for embedded systems
 - **nb**: Non-blocking operations support
@@ -296,6 +295,6 @@ Ararext - Custom Bootloader Development
 
 ---
 
-**Status**: Active Development (v0.1.0)  
+**Status**: Active Development (not production-ready)  
 **Last Updated**: 2026  
 **Platform**: STM32F407xx (Cortex-M4F)

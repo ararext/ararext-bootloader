@@ -4,11 +4,11 @@
 
 ### Repository Location
 ```
-/home/ararext/Documents/Kernel/ararext-bootloader/
+/home/ararext/update_projects/ararext-bootloader/
 ```
 
 ### Project Overview
-**Ararext Bootloader** is a complete, production-ready STM32F407xx bootloader implementation in Rust, offering memory safety, excellent code organization, and comprehensive documentation.
+**Ararext Bootloader** is an in-progress STM32F407xx bootloader implementation in Rust, with compileable core protocol handling and modular architecture.
 
 ## What Was Created
 
@@ -44,7 +44,7 @@
    - Type-safe memory region enumeration
 
 6. **crc.rs** (35 lines)
-   - CRC-32 verification using hardware peripheral
+   - CRC-32 verification for incoming protocol frames
    - Data integrity validation
 
 7. **flash.rs** (140 lines)
@@ -94,7 +94,7 @@
 
 ## Key Features
 
-### ✅ All 12 Bootloader Commands Implemented
+### ⚠️ 12 Bootloader Command IDs Defined
 - BL_GET_VER (0x51) - Version retrieval
 - BL_GET_HELP (0x52) - Command list
 - BL_GET_CID (0x53) - Chip ID
@@ -108,18 +108,21 @@
 - BL_OTP_READ (0x5B) - OTP reading
 - BL_DIS_R_W_PROTECT (0x5C) - Disable protection
 
+Current runtime behavior:
+- Implemented command path: GET_VER, GET_HELP, GET_CID, GET_RDP_STATUS, GO_TO_ADDR, MEM_READ, READ_SECTOR_P_STATUS
+- Present but currently NACK by design: FLASH_ERASE, MEM_WRITE, EN_RW_PROTECT, OTP_READ, DIS_R_W_PROTECT
+
 ### ✅ Safety Features
-- CRC-32 verification on all commands
+- CRC-32 verification on incoming protocol frames
 - Address validation before jumping
 - Sector-based flash protection
 - Type-safe command packet parsing
 - Compile-time bounds checking
 
-### ✅ Production-Ready
-- No unsafe code except where hardware-mandated
-- Comprehensive error handling
-- Proper resource cleanup
-- Memory safety guaranteed at compile time
+### ⚠️ Current Status
+- Builds successfully with `cargo check`
+- Core protocol parser/dispatcher is functional
+- Several flash/protection operations are intentionally not yet wired to HAL flash programming and return `NACK`
 
 ## Project Statistics
 
@@ -337,13 +340,13 @@ ararext-bootloader/
 
 ## Key Metrics
 
-- **Code Quality**: Production-grade, fully type-safe
+- **Code Quality**: In active development, type-safe core protocol path
 - **Binary Size**: 25 KB (3 KB smaller than C version)
 - **Performance**: On-par with C implementation
 - **Memory Usage**: ~3 KB runtime (mostly stack)
 - **Documentation**: Comprehensive (2000+ lines)
 - **Build Time**: ~90 seconds for release build
-- **Safety**: 100% memory-safe (no undefined behavior)
+- **Safety**: Improved via strict frame parsing, CRC checks, and address validation
 
 ## Next Steps
 

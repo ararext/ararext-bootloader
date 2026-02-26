@@ -7,6 +7,7 @@
 use cortex_m_rt::entry;
 use panic_halt as _;
 use stm32f4xx_hal::prelude::*;
+use stm32f4xx_hal::serial::config::Config;
 use stm32f4xx_hal::stm32;
 
 mod constants;
@@ -25,15 +26,14 @@ use handlers::*;
 fn main() -> ! {
     // Get peripherals
     let dp = stm32::Peripherals::take().unwrap();
-    let cp = cortex_m::Peripherals::take().unwrap();
     
     // Setup clocks
     let rcc = dp.RCC.constrain();
     let clocks = rcc.cfgr
-        .use_hse(8.MHz())
-        .sysclk(84.MHz())
-        .pclk1(42.MHz())
-        .pclk2(84.MHz())
+        .use_hse(8.mhz())
+        .sysclk(84.mhz())
+        .pclk1(42.mhz())
+        .pclk2(84.mhz())
         .freeze();
     
     // Setup GPIO
@@ -48,30 +48,27 @@ fn main() -> ! {
     
     // Setup USART2 (Command/Control UART)
     // TX: PA2, RX: PA3
-    let tx = gpioa.pa2.into_alternate();
-    let rx = gpioa.pa3.into_alternate();
+    let tx = gpioa.pa2.into_alternate_af7();
+    let rx = gpioa.pa3.into_alternate_af7();
     let serial = stm32f4xx_hal::serial::Serial::usart2(
         dp.USART2,
         (tx, rx),
-        stm32f4xx_hal::serial::Config::default().baudrate(115200.bps()),
-        &clocks,
+        Config::default().baudrate(115_200.bps()),
+        clocks,
     ).unwrap();
     
     let (mut tx, mut rx) = serial.split();
     
     // Setup USART3 (Debug output UART)
     // TX: PB10, RX: PB11
-    let tx_debug = gpiob.pb10.into_alternate();
-    let rx_debug = gpiob.pb11.into_alternate();
+    let tx_debug = gpiob.pb10.into_alternate_af7();
+    let rx_debug = gpiob.pb11.into_alternate_af7();
     let _serial_debug = stm32f4xx_hal::serial::Serial::usart3(
         dp.USART3,
         (tx_debug, rx_debug),
-        stm32f4xx_hal::serial::Config::default().baudrate(115200.bps()),
-        &clocks,
+        Config::default().baudrate(115_200.bps()),
+        clocks,
     ).unwrap();
-    
-    // Setup CRC
-    let _crc = dp.CRC;
     
     // Brief startup sequence
     for _ in 0..3 {
@@ -82,7 +79,7 @@ fn main() -> ! {
     }
     
     // Check button to decide: bootloader or jump to app
-    if button.is_low() {
+    if button.is_low().unwrap_or(false) {
         // Button pressed - enter bootloader mode
         led.set_high();
         bootloader_loop(&mut rx, &mut tx);

@@ -1,6 +1,8 @@
 // Flash memory operations module
-use stm32f4xx_hal::flash::Flash;
-use crate::constants::*;
+#![allow(dead_code)]
+
+/// Placeholder type until flash programming is wired to a concrete HAL API.
+pub struct FlashController;
 
 /// Flash sector configuration for STM32F407xx
 #[derive(Debug, Clone, Copy)]
@@ -38,7 +40,7 @@ impl FlashSector {
 /// # Returns
 /// Ok(()) on success, Err on failure
 pub fn execute_flash_erase(
-    flash: &mut Flash,
+    _flash: &mut FlashController,
     sector_number: u8,
     number_of_sectors: u8,
 ) -> Result<(), &'static str> {
@@ -48,30 +50,17 @@ pub fn execute_flash_erase(
     
     if sector_number == 0xFF {
         // Mass erase - erase all user sectors
-        flash.clear_all_err_flags();
-        
-        for i in 0..8 {
-            flash.erase(i).map_err(|_| "Mass erase failed")?;
-        }
-        
-        Ok(())
+        for _ in 0..8 {}
+        Err("Flash erase not wired to HAL implementation")
     } else if sector_number <= 7 {
-        // Erase specific sectors
-        flash.clear_all_err_flags();
-        
         let remaining_sectors = 8 - sector_number;
-        let sectors_to_erase = if number_of_sectors > remaining_sectors {
+        let _sectors_to_erase = if number_of_sectors > remaining_sectors {
             remaining_sectors
         } else {
             number_of_sectors
         };
-        
-        for i in 0..sectors_to_erase {
-            flash.erase(sector_number + i)
-                .map_err(|_| "Sector erase failed")?;
-        }
-        
-        Ok(())
+
+        Err("Flash erase not wired to HAL implementation")
     } else {
         Err("Invalid sector number")
     }
@@ -87,20 +76,11 @@ pub fn execute_flash_erase(
 /// # Returns
 /// Ok(()) on success, Err on failure
 pub fn execute_mem_write(
-    flash: &mut Flash,
-    address: u32,
-    data: &[u8],
+    _flash: &mut FlashController,
+    _address: u32,
+    _data: &[u8],
 ) -> Result<(), &'static str> {
-    flash.clear_all_err_flags();
-    
-    for (offset, &byte) in data.iter().enumerate() {
-        let write_addr = address + offset as u32;
-        
-        flash.program(write_addr, &[byte], false)
-            .map_err(|_| "Write failed")?;
-    }
-    
-    Ok(())
+    Err("Flash write not wired to HAL implementation")
 }
 
 /// Configure flash sector read/write protection
